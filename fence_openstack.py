@@ -68,8 +68,13 @@ def fence_instance(id):
 	if not FENCE_USER: FENCE_USER = ask_question("Enter Fencing User: ", False)
 	if not FENCE_KEY: FENCE_KEY = ask_question("Enter Fencing Key: ", False)
 	
-	subprocess.check_call(['fence_virsh', '-o', 'off', '-a', HYPERVISOR, '-l', FENCE_USER, '-k', FENCE_KEY, '-n', VM_NAME])
-	
+	try:
+		subprocess.check_call(['fence_virsh', '-o', 'off', '-a', HYPERVISOR, '-l', FENCE_USER, '-k', FENCE_KEY, '-n', VM_NAME])
+		print "INFO: Successfully fenced instance %s" % VM_NAME
+		sys.exit(0)
+	except:
+		print "ERROR: Unable to fence instance %s" %VM_NAME
+
 def get_instances(do_return):
 	nova = authenticate()
 	server_list = nova.servers.list(detailed = True, search_opts = {'all_tenants': 1})

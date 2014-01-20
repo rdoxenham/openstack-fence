@@ -1,0 +1,149 @@
+#!/usr/bin/env python
+# OpenStack Fence Tool for KVM
+# Rhys Oxenham <roxenham@redhat.com>
+
+import novaclient.v1_1.client as nvclient
+import getpass
+import getopt
+import subprocess
+import sys
+
+FENCE_USER = None
+FENCE_KEY = None
+
+def usage():
+	print "OpenStack Fence Tool"
+	print "Usage: " + sys.argv[0],
+	print "<option> [argument]\n"
+	print "\t-h, --help\t\tPrints this usage/help menu"
+	print "\t-l, --list\t\tLists all available instances"
+	print "\t-f, --fence\t\tFences a node, based on instance id"
+	print "\n\tExamples: " + sys.argv[0],
+	print " --list"
+	print "\t\t  " + sys.argv[0],
+	print " --fence d92828b2-5e58-45bc-8dab-aa7d288b9e97"
+	print "\n"
+
+def authenticate():
+	devnull = open('/dev/null', 'w')
+	try:
+		conf = open("fence_openstack.conf")
+	except: conf = None
+
+	if conf:
+		AUTH_URL, KEYSTONE_USER, KEYSTONE_PASS, KEYSTONE_TENANT = parse_config(conf)
+
+		if not AUTH_URL or not KEYSTONE_USER or not KEYSTONE_PASS:
+			sys.exit(1)
+	else:
+		print "INFO: No configuration file found.\n"
+		AUTH_URL = ask_question('Keystone Auth URL: ', False)
+		KEYSTONE_USER = ask_question('Keystone Username: ', False)
+		KEYSTONE_PASS = ask_question('Keystone Password: ', True)
+		KEYSTONE_TENANT = ask_question('Keystone Tenant: ', False)
+		print "\n"
+		
+	nova = nvclient.Client(KEYSTONE_USER, KEYSTONE_PASS, KEYSTONE_TENANT, AUTH_URL)
+	return nova
+
+def translate_keys(collection, convert):
+    for item in collection:
+        keys = item.__dict__.keys()
+        for from_key, to_key in convert:
+            if from_key in keys and to_key not in keys:
+                setattr(item, to_key, item._info[from_key])
+
+def fence_instance(id):
+	global FENCE_USER, FENCE_KEY
+	HYPERVISOR = None
+	VM_NAME = None
+	nova = authenticate()
+	server_list = list_instances(True)
+	for server in server_list:
+		if server.id == id:
+			VM_NAME = server.vm_name
+			HYPERVISOR = server.host
+			break
+	
+	if not FENCE_USER: FENCE_USER = ask_question("Enter Fencing User: ", False)
+	if not FENCE_KEY: FENCE_KEY = ask_question("Enter Fencing Key: ", False)
+	
+	subprocess.check_call(['fence_virsh', '-o', 'off', '-a', HYPERVISOR, '-l', FENCE_USER, \
+								'-k', FENCE_KEY, '-n', VM_NAME])
+	
+def list_instances(do_return):
+	nova = authenticate()
+	server_list = nova.servers.list(detailed = True, search_opts = {'all_tenants': 1})
+	convert = [('OS-EXT-SRV-ATTR:host', 'host'), ('OS-EXT-SRV-ATTR:instance_name', 'vm_name')]
+	translate_keys(server_list, convert)
+
+	if do_return: return server_list
+
+	for server in server_list:
+		print "\nInstance Name: %s" % server.name
+		print "Instance ID: %s" % server.id
+		print "VM Name: %s" % server.vm_name
+		print "Hypervisor: %s" % server.host
+	sys.exit(0)
+
+def ask_question(question, hidden):
+        answer = None
+        if not hidden:
+                while answer == "" or answer == None:
+                        answer = raw_input(question)
+        else:
+                while answer == None:
+                        answer = getpass.getpass(question)
+        return answer
+
+def parse_config(conf):
+	AUTH_URL = None
+	KEYSTONE_USER = None
+	KEYSTONE_PASS = None
+	KEYSTONE_TENANT = None
+	global FENCE_USER, FENCE_KEY
+
+	try:
+		for line in conf.readlines():
+			if not "#" in line:
+				if "AUTH_URL" in line:
+					line = line.strip()
+					value = line.split('=')
+					if len(value[1]) > 0: AUTH_URL = value[1]
+				if "KEYSTONE_USER" in line:
+					line = line.strip()
+					value = line.split('=')
+					if len(value[1]) > 0: KEYSTONE_USER = value[1]
+				if "KEYSTONE_PASS" in line:
+					line = line.strip()
+					value = line.split('=')
+					if len(value[1]) > 0: KEYSTONE_PASS = value[1]
+				if "KEYSTONE_TENANT" in line:
+					line = line.strip()
+					value = line.split('=')
+					if len(value[1]) > 0: KEYSTONE_TENANT = value[1]
+				if "FENCE_USER" in line:
+					line = line.strip()
+					value = line.split('=')
+					if len(value[1]) > 0: FENCE_USER = value[1]
+				if "FENCE_KEY" in line:
+					line = line.strip()
+					value = line.split('=')
+					if len(value[1]) > 0: FENCE_KEY = value[1]
+	except:	sys.exit(1)
+
+	return AUTH_URL, KEYSTONE_USER, KEYSTONE_PASS, KEYSTONE_TENANT
+
+if __name__ == "__main__":
+	try:
+		options, other = getopt.getopt(sys.argv[1:], 'hlf:;', ['help','list','fence=',])
+
+	except:
+		print "FATAL: Unknown options specified. Use --help for usage information."
+		sys.exit(1)
+
+	for opt, arg in options:
+		if opt in ('-h', '--help'): usage()
+		if opt in ('-l', '--list'): list_instances(False)
+		if opt in ('-f', '--fence'): fence_instance(arg)
+	sys.exit(2)

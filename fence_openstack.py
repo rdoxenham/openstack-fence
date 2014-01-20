@@ -58,7 +58,7 @@ def fence_instance(id):
 	HYPERVISOR = None
 	VM_NAME = None
 	nova = authenticate()
-	server_list = list_instances(True)
+	server_list = get_instances(True)
 	for server in server_list:
 		if server.id == id:
 			VM_NAME = server.vm_name
@@ -68,10 +68,9 @@ def fence_instance(id):
 	if not FENCE_USER: FENCE_USER = ask_question("Enter Fencing User: ", False)
 	if not FENCE_KEY: FENCE_KEY = ask_question("Enter Fencing Key: ", False)
 	
-	subprocess.check_call(['fence_virsh', '-o', 'off', '-a', HYPERVISOR, '-l', FENCE_USER, \
-								'-k', FENCE_KEY, '-n', VM_NAME])
+	subprocess.check_call(['fence_virsh', '-o', 'off', '-a', HYPERVISOR, '-l', FENCE_USER, '-k', FENCE_KEY, '-n', VM_NAME])
 	
-def list_instances(do_return):
+def get_instances(do_return):
 	nova = authenticate()
 	server_list = nova.servers.list(detailed = True, search_opts = {'all_tenants': 1})
 	convert = [('OS-EXT-SRV-ATTR:host', 'host'), ('OS-EXT-SRV-ATTR:instance_name', 'vm_name')]
@@ -144,6 +143,6 @@ if __name__ == "__main__":
 
 	for opt, arg in options:
 		if opt in ('-h', '--help'): usage()
-		if opt in ('-l', '--list'): list_instances(False)
+		if opt in ('-l', '--list'): get_instances(False)
 		if opt in ('-f', '--fence'): fence_instance(arg)
 	sys.exit(2)

@@ -71,9 +71,10 @@ def fence_instance(id):
 	try:
 		subprocess.check_call(['fence_virsh', '-o', 'off', '-a', HYPERVISOR, '-l', FENCE_USER, '-k', FENCE_KEY, '-n', VM_NAME])
 		print "INFO: Successfully fenced instance %s" % VM_NAME
-		sys.exit(0)
 	except:
 		print "ERROR: Unable to fence instance %s" %VM_NAME
+		sys.exit(1)
+	sys.exit(0)
 
 def get_instances(do_return):
 	nova = authenticate()

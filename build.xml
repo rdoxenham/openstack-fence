@@ -29,7 +29,7 @@
 			<mkdir dir="${build.dir}/rpm/INSTALL" />
 			<copy todir="${build.dir}/rpm/SPECS" file="extra/openstack-fence.spec" />
 			<copy todir="${build.dir}/rpm/INSTALL/usr/bin/" file="fence_openstack" />
-			<copy todir="${build.dir}/rpm/INSTALL/usr/share/forecast/" file="extra/fence_openstack.conf.sample" />
+			<copy todir="${build.dir}/rpm/INSTALL/usr/share/openstack-fence/" file="extra/fence_openstack.conf.sample" />
 			<rpm specFile = "forecast.spec" topdir = "${build.dir}/rpm" cleanBuildDir = "true" failOnError = "true" command = "-bb --buildroot=${build.dir}/rpm/INSTALL"/>
 	</target>
 

@@ -50,7 +50,7 @@ The sample configuration file details the configuration options applicable to th
 
 **FENCE_USER**: The user to connect to the hypervisor as (must match key below)
 
-**FENCE_KEY**: The path to the users private identity/ssh key, e.g. **/etc/.ssh/id_rsa**
+**FENCE_KEY**: The path to the users private identity/ssh key, e.g. **/root/.ssh/id_rsa**
 
 
 ##**Usage**##

@@ -44,13 +44,13 @@ The sample configuration file details the configuration options applicable to th
 
 **KEYSTONE_USER**: The user (with the **admin** role) to query Nova with
 
-**KEYSTONE_PASS**: The password for the _KEYSTONE_USER_
+**KEYSTONE_PASS**: The password for the **KEYSTONE_USER**
 
-**KEYSTONE_TENANT**: The tenant/project for the _KEYSTONE_USER_
+**KEYSTONE_TENANT**: The tenant/project for the **KEYSTONE_USER**
 
 **FENCE_USER**: The user to connect to the hypervisor as (must match key below)
 
-**FENCE_KEY**: The path to the users private identity/ssh key, e.g. _/etc/.ssh/id_rsa_
+**FENCE_KEY**: The path to the users private identity/ssh key, e.g. **/etc/.ssh/id_rsa**
 
 
 ##**Usage**##

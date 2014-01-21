@@ -1,0 +1,25 @@
+# OpenStack Fence Configuration File
+
+# Keystone Authentication URL
+# AUTH_URL=http://10.0.0.1:35357/v2.0
+AUTH_URL=
+
+# Keystone User configured with 'admin' role
+# KEYSTONE_USER=admin
+KEYSTONE_USER=
+
+# Keystone Password for the KEYSTONE_USER
+# KEYSTONE_PASS=PaS$w0rd
+KEYSTONE_PASS=
+
+# Keystone Tenant for the KEYSTONE_USER
+# KEYSTONE_TENANT=admin
+KEYSTONE_TENANT=
+
+# User to execute the fence command as
+# FENCE_USER=root
+FENCE_USER=
+
+# Private SSH identity key to use for fencing
+# FENCE_KEY=/root/.ssh/id_rsa
+FENCE_KEY=

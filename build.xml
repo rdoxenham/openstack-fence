@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<project name="openstack-fence" default="main" basedir=".">
+	<!-- Sets variables which can later be used. -->
+	<!-- The value of a property is accessed via ${} -->
+	<property name="src.dir" location="src" />
+	<property name="build.dir" location="build" />
+	<property name="dist.dir" location="dist" />
+	<property name="rpm.dir" location="rpm" />
+	<property name="lib.dir" location="lib" />
+
+	<!-- Deletes the existing build, docs and dist directory-->
+	<target name="clean">
+		<delete dir="${build.dir}" />
+		<delete dir="${dist.dir}" />
+	</target>
+
+	<!-- Creates the  build, docs and dist directory-->
+	<target name="makedir">
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${dist.dir}" />
+	</target>
+	
+	<target name = "rpm">
+			<mkdir dir="${build.dir}/rpm/RPMS" />
+			<mkdir dir="${build.dir}/rpm/SPECS" />
+			<mkdir dir="${build.dir}/rpm/SOURCES" />
+			<mkdir dir="${build.dir}/rpm/BUILD" />
+			<mkdir dir="${build.dir}/rpm/SRPMS" />
+			<mkdir dir="${build.dir}/rpm/INSTALL" />
+			<copy todir="${build.dir}/rpm/SPECS" file="extra/openstack-fence.spec" />
+			<copy todir="${build.dir}/rpm/INSTALL/usr/bin/" file="fence_openstack" />
+			<copy todir="${build.dir}/rpm/INSTALL/usr/share/forecast/" file="extra/fence_openstack.conf.sample" />
+			<rpm specFile = "forecast.spec" topdir = "${build.dir}/rpm" cleanBuildDir = "true" failOnError = "true" command = "-bb --buildroot=${build.dir}/rpm/INSTALL"/>
+	</target>
+
+	<target name="main" depends="rpm">
+		<description>openstack-fence Main</description>
+	</target>
+
+</project>

@@ -27,7 +27,7 @@ def usage():
 def authenticate():
 	devnull = open('/dev/null', 'w')
 	try:
-		conf = open("fence_openstack.conf")
+		conf = open("/etc/fence_openstack.conf")
 	except: conf = None
 
 	if conf:
@@ -72,7 +72,7 @@ def fence_instance(id):
 		subprocess.check_call(['fence_virsh', '-o', 'off', '-a', HYPERVISOR, '-l', FENCE_USER, '-k', FENCE_KEY, '-n', VM_NAME])
 		print "INFO: Successfully fenced instance %s" % VM_NAME
 	except:
-		print "ERROR: Unable to fence instance %s" %VM_NAME
+		print "ERROR: Unable to fence instance %s" % id
 		sys.exit(1)
 	sys.exit(0)
 

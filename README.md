@@ -10,7 +10,7 @@ No modification of OpenStack or any of the sub-components are required to make u
 
 **Disclaimer**: I take _no_ responsibility for any losses incurred whilst using this code. This is **not** a supported or accredited package from Red Hat - usage is at your own risk! :-)
 
-##**Building**##
+##**Building & Installation**##
 
 The code provided within GitHub is source-code only, therefore to install as a deployable package, a build file is provided (build.xml). The steps below will help you build the package:
 
@@ -85,7 +85,7 @@ The return code can then be checked (for exit status checking):
 
 I very much welcome feedback, comments, critique and merge requests :-)
 
-Please get in contact with me, I'm 'rdo' on Freenode or available at _roxenham@redhat.com_
+Please get in contact with me, I'm '**rdo**' on Freenode or available at _roxenham@redhat.com_
 
 ##**TODO's**##
 
